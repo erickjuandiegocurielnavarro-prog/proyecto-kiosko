@@ -177,13 +177,8 @@ app.get('/api/productos', (req, res) => {
   ]);
 });
 
-// Capturar la ruta específica /mongodb/ y cualquier otra URL
-app.get(['/', '/mongodb', '/mongodb/*'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-// Catch-all para responder con el HTML principal ante cualquier otra ruta desconocida
-app.get('*', (req, res) => {
+// Servir la aplicación cliente HTML para cualquier ruta de navegación
+app.use((req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
