@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aroma & Miga | Menú y Tabla MongoDB</title>
+  <meta name="description" content="Catálogo exclusivo de café, frappé, combos y pan con tabla de visualización de datos MongoDB.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Background Decorative Elements -->
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+
+  <!-- Header / Navigation -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="#" class="brand-logo" onclick="switchMainView('menu')">
+        <div class="logo-icon"><i class="fa-solid fa-mug-hot"></i></div>
+        <div class="logo-text">
+          <span class="brand-name">Aroma & Miga</span>
+          <span class="brand-sub">Café & MongoDB</span>
+        </div>
+      </a>
+
+      <!-- View Switcher Tabs -->
+      <div class="nav-switcher">
+        <button id="viewMenuBtn" class="switch-tab active" onclick="switchMainView('menu')">
+          <i class="fa-solid fa-mug-hot"></i> Menú
+        </button>
+        <button id="viewMongoBtn" class="switch-tab" onclick="switchMainView('mongo')">
+          <i class="fa-solid fa-table-list"></i> Tabla MongoDB
+        </button>
+      </div>
+
+      <div class="nav-controls">
+        <div class="search-box" id="menuSearchBox">
+          <i class="fa-solid fa-search search-icon"></i>
+          <input type="text" id="searchInput" placeholder="Buscar en los productos..." autocomplete="off">
+          <button id="clearSearch" class="clear-btn" style="display:none;"><i class="fa-solid fa-times"></i></button>
+        </div>
+
+        <button id="themeToggle" class="icon-btn" title="Cambiar tema">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+
+        <button id="cartBtn" class="cart-btn">
+          <i class="fa-solid fa-shopping-bag"></i>
+          <span class="cart-label">Mi Pedido</span>
+          <span id="cartBadge" class="badge">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section (Visible in Menu View) -->
+  <section id="heroSection" class="hero">
+    <div class="container hero-content">
+      <div class="hero-tag"><i class="fa-solid fa-star"></i> Menú Especializado</div>
+      <h1 class="hero-title">Nuestras 4 Especialidades</h1>
+      <p class="hero-desc">
+        Explora nuestro catálogo exclusivo seleccionado con los mejores granos de café, frappés helados, combos completos y pan fresco horneado día a día.
+      </p>
+      
+      <!-- Category Badges Banner -->
+      <div class="hero-categories">
+        <div class="hero-cat-chip" onclick="filterCategory('cafe')">
+          <i class="fa-solid fa-mug-saucer"></i> <span>Café</span>
+        </div>
+        <div class="hero-cat-chip" onclick="filterCategory('frappe')">
+          <i class="fa-solid fa-glass-water-droplet"></i> <span>Frappé</span>
+        </div>
+        <div class="hero-cat-chip" onclick="filterCategory('combos')">
+          <i class="fa-solid fa-utensils"></i> <span>Combos</span>
+        </div>
+        <div class="hero-cat-chip" onclick="filterCategory('pan')">
+          <i class="fa-solid fa-bread-slice"></i> <span>Pan en General</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Catalog Section (Visible in Menu View) -->
+  <main id="catalogSection" class="container catalog-section">
+    <!-- Category Filter Bar -->
+    <div class="filter-wrapper">
+      <div class="filter-bar">
+        <button class="filter-btn active" data-category="all">
+          <i class="fa-solid fa-border-all"></i> Todos (4)
+        </button>
+        <button class="filter-btn" data-category="cafe">
+          <i class="fa-solid fa-mug-hot"></i> Café
+        </button>
+        <button class="filter-btn" data-category="frappe">
+          <i class="fa-solid fa-snowflake"></i> Frappé
+        </button>
+        <button class="filter-btn" data-category="combos">
+          <i class="fa-solid fa-box-archive"></i> Combos
+        </button>
+        <button class="filter-btn" data-category="pan">
+          <i class="fa-solid fa-bread-slice"></i> Pan en General
+        </button>
+      </div>
+
+      <div class="view-toggle">
+        <button id="grid3Btn" class="toggle-btn active" title="Vista Cuadrícula"><i class="fa-solid fa-grip"></i></button>
+        <button id="listBtn" class="toggle-btn" title="Vista Lista"><i class="fa-solid fa-list"></i></button>
+      </div>
+    </div>
+
+    <!-- Product Grid -->
+    <div id="productGrid" class="product-grid">
+      <!-- Cards will be populated dynamically by JavaScript -->
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="empty-state" style="display: none;">
+      <i class="fa-solid fa-magnifying-glass-minus"></i>
+      <h3>No se encontraron resultados</h3>
+      <p>Intenta buscando otra palabra o selecciona una de las 4 categorías principales.</p>
+      <button onclick="resetFilters()" class="btn-primary">Ver todas las categorías</button>
+    </div>
+  </main>
+
+  <!-- Section: MongoDB Data Table -->
+  <section id="mongoSection" class="container mongo-section" style="display: none;">
+    <!-- Header & Status -->
+    <div class="mongo-header">
+      <div class="mongo-title-box">
+        <h2><i class="fa-solid fa-database"></i> Registros de MongoDB</h2>
+        <p>Visualización y administración en tiempo real de tu colección de MongoDB (<code>{ _id, name, precio, user }</code>)</p>
+      </div>
+      <div id="mongoStatusBadge" class="mongo-status-badge status-active">
+        <span class="status-dot"></span> <span id="statusText">Verificando conexión...</span>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fa-solid fa-list-ol"></i></div>
+        <div class="stat-info">
+          <span class="stat-label">Total de Registros</span>
+          <span id="statTotalCount" class="stat-value">0</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fa-solid fa-calculator"></i></div>
+        <div class="stat-info">
+          <span class="stat-label">Precio Promedio</span>
+          <span id="statAvgPrice" class="stat-value">$0.00</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fa-solid fa-sack-dollar"></i></div>
+        <div class="stat-info">
+          <span class="stat-label">Total Acumulado</span>
+          <span id="statTotalPrice" class="stat-value">$0.00</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Grid: Form + Table -->
+    <div class="mongo-content-grid">
+      <!-- Form Card to Insert Data into MongoDB -->
+      <div class="mongo-form-card">
+        <h3><i class="fa-solid fa-plus-circle"></i> Agregar a MongoDB</h3>
+        <form id="mongoForm" onsubmit="handleMongoSubmit(event)">
+          <div class="form-group">
+            <label for="inputName">Nombre del producto (<code>name</code>)</label>
+            <input type="text" id="inputName" placeholder="Ej. latte, cappuccino" required autocomplete="off">
+          </div>
+          
+          <div class="form-group">
+            <label for="inputPrice">Precio (<code>precio</code>)</label>
+            <div class="input-prefix-wrapper">
+              <span class="prefix">$</span>
+              <input type="number" id="inputPrice" step="0.5" placeholder="40" required autocomplete="off">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="inputUser">Usuario (<code>user</code>)</label>
+            <input type="text" id="inputUser" placeholder="@anonimo" value="@anonimo" required autocomplete="off">
+          </div>
+
+          <button type="submit" id="btnSubmitMongo" class="btn-primary btn-block">
+            <i class="fa-solid fa-cloud-arrow-up"></i> Insertar en MongoDB
+          </button>
+        </form>
+      </div>
+
+      <!-- Table Box -->
+      <div class="mongo-table-card">
+        <div class="table-toolbar">
+          <div class="table-search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="mongoSearchInput" placeholder="Filtrar por nombre, ID o usuario..." oninput="filterMongoTable()">
+          </div>
+          <button onclick="fetchLatteData()" class="btn-secondary" title="Actualizar datos">
+            <i class="fa-solid fa-rotate-right"></i> Recargar
+          </button>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID (ObjectId)</th>
+                <th>Nombre (<code>name</code>)</th>
+                <th>Precio (<code>precio</code>)</th>
+                <th>Usuario (<code>user</code>)</th>
+                <th>Fecha de Registro</th>
+                <th style="text-align: center;">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="mongoTableBody">
+              <!-- Dynamic rows -->
+            </tbody>
+          </table>
+        </div>
+
+        <div id="mongoEmptyState" class="table-empty" style="display: none;">
+          <i class="fa-solid fa-inbox"></i>
+          <p>No se encontraron registros en la colección de MongoDB.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Product Detail Modal -->
+  <div id="productModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+      <button id="closeModal" class="modal-close-btn">&times;</button>
+      
+      <div class="modal-body">
+        <div class="modal-img-container">
+          <img id="modalImg" src="" alt="Imagen de Producto">
+          <span id="modalCategoryTag" class="category-chip">Categoría</span>
+        </div>
+        <div class="modal-info">
+          <h2 id="modalTitle">Título del Producto</h2>
+          <div class="modal-price-row">
+            <span id="modalPrice" class="modal-price">$0.00</span>
+            <div class="rating"><i class="fa-solid fa-star"></i> 4.9 (Reseñas)</div>
+          </div>
+          <p id="modalDescription" class="modal-description">Descripción detallada...</p>
+          
+          <div class="modal-highlights">
+            <div class="highlight-item">
+              <i class="fa-solid fa-fire-flame-curved"></i>
+              <span>Ingredientes de Calidad</span>
+            </div>
+            <div class="highlight-item">
+              <i class="fa-solid fa-clock"></i>
+              <span>Preparado al Momento</span>
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <div class="quantity-selector">
+              <button id="qtyMinus" class="qty-btn">-</button>
+              <span id="qtyVal">1</span>
+              <button id="qtyPlus" class="qty-btn">+</button>
+            </div>
+            <button id="modalAddCartBtn" class="btn-primary flex-grow">
+              <i class="fa-solid fa-cart-plus"></i> Agregar al Pedido
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cart Drawer -->
+  <div id="cartDrawer" class="cart-drawer-overlay">
+    <div class="cart-drawer">
+      <div class="cart-header">
+        <h3><i class="fa-solid fa-bag-shopping"></i> Tu Pedido</h3>
+        <button id="closeCart" class="close-cart-btn">&times;</button>
+      </div>
+
+      <div id="cartItemsList" class="cart-items-list">
+        <!-- Cart Items inserted dynamically -->
+      </div>
+
+      <div class="cart-footer">
+        <div class="cart-summary-row">
+          <span>Subtotal</span>
+          <span id="cartSubtotal">$0.00</span>
+        </div>
+        <div class="cart-summary-row total-row">
+          <span>Total Estimado</span>
+          <span id="cartTotal">$0.00</span>
+        </div>
+        <button id="checkoutBtn" class="btn-primary btn-block" onclick="checkout()">
+          <i class="fa-solid fa-check-circle"></i> Confirmar Pedido
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-brand">
+        <h3>Aroma & Miga</h3>
+        <p>Especialistas en <strong>Café</strong>, <strong>Frappé</strong>, <strong>Combos</strong>, <strong>Pan</strong> y desarrollo con <strong>MongoDB</strong>.</p>
+      </div>
+      <div class="footer-copy">
+        <p>&copy; 2026 Menú Digital & MongoDB Dashboard. Todos los derechos reservados.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="toast">
+    <i class="fa-solid fa-check-circle"></i>
+    <span id="toastMsg">Notificación</span>
+  </div>
+
+  <!-- App Logic Script -->
+  <script src="app.js"></script>
+</body>
+</html>
