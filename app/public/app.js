@@ -53,16 +53,17 @@ let modalQuantity = 1;
 let mongoItems = [];
 let currentMainView = 'menu'; // 'menu' or 'mongo'
 
-// Helper dinámico para resolver la URL de API conectando directamente al servidor de Node.js (Puerto 5000)
+// Helper dinámico para resolver la URL de API según si se accede por Apache AppServ o Node.js
 function getApiUrl(type = 'list', id = '') {
-  // Si no está ejecutándose en el puerto 5000, redirige las peticiones al puerto del servidor Node.js
-  const baseUrl = window.location.port === '5000' 
-    ? '' 
-    : `${window.location.protocol}//${window.location.hostname}:5000`;
-
-  if (type === 'delete') return `${baseUrl}/api/latte/${id}`;
-  if (type === 'create') return `${baseUrl}/api/latte`;
-  return `${baseUrl}/api/latte`;
+  const isNodePort = window.location.port === '5000';
+  if (isNodePort) {
+    if (type === 'delete') return `/api/latte/${id}`;
+    return '/api/latte';
+  } else {
+    // Modo AppServ / Apache nativo
+    if (type === 'delete') return `api.php?action=delete&id=${id}`;
+    return 'api.php';
+  }
 }
 
 // DOM Elements
@@ -293,8 +294,9 @@ async function deleteMongoItem(id) {
 
   try {
     const url = getApiUrl('delete', id);
+    const isNode = window.location.port === '5000';
     const response = await fetch(url, {
-      method: 'DELETE'
+      method: isNode ? 'DELETE' : 'GET'
     });
 
     const result = await response.json();
