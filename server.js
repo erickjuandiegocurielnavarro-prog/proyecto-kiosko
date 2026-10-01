@@ -6,6 +6,7 @@ require('dotenv').config();
 const connectDB = require('./src/config/db');
 const latteRoutes = require('./src/routes/latteRoutes');
 const productRoutes = require('./src/routes/productRoutes');
+const orderRoutes = require('./src/routes/orderRoutes');
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -27,6 +28,7 @@ app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
 // Rutas de la API (REST CRUD)
 app.use('/api/latte', latteRoutes);
 app.use('/api/productos', productRoutes);
+app.use('/api/pedidos', orderRoutes);
 
 // Manejador principal para la vista HTML (Garantiza que no dé error ENOENT)
 const renderIndexHtml = (req, res) => {

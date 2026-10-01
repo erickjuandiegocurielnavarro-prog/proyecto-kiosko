@@ -94,34 +94,43 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchLatteData(); // Cargar datos de MongoDB al iniciar
 });
 
-// Switch Main View (Menu vs Tabla MongoDB)
+// Switch Main View (Menu vs Tabla MongoDB vs Tabla Pedidos)
 function switchMainView(viewName) {
   currentMainView = viewName;
   const heroSec = document.getElementById('heroSection');
   const catalogSec = document.getElementById('catalogSection');
   const mongoSec = document.getElementById('mongoSection');
+  const ordersSec = document.getElementById('ordersSection');
+  
   const viewMenuBtn = document.getElementById('viewMenuBtn');
   const viewMongoBtn = document.getElementById('viewMongoBtn');
+  const viewOrdersBtn = document.getElementById('viewOrdersBtn');
   const menuSearchBox = document.getElementById('menuSearchBox');
 
-  if (viewName === 'mongo') {
-    if (heroSec) heroSec.style.display = 'none';
-    if (catalogSec) catalogSec.style.display = 'none';
-    if (mongoSec) mongoSec.style.display = 'block';
-    if (menuSearchBox) menuSearchBox.style.display = 'none';
-    
-    if (viewMenuBtn) viewMenuBtn.classList.remove('active');
-    if (viewMongoBtn) viewMongoBtn.classList.add('active');
+  // Ocultar todas las secciones por defecto
+  if (heroSec) heroSec.style.display = 'none';
+  if (catalogSec) catalogSec.style.display = 'none';
+  if (mongoSec) mongoSec.style.display = 'none';
+  if (ordersSec) ordersSec.style.display = 'none';
+  if (menuSearchBox) menuSearchBox.style.display = 'none';
 
+  if (viewMenuBtn) viewMenuBtn.classList.remove('active');
+  if (viewMongoBtn) viewMongoBtn.classList.remove('active');
+  if (viewOrdersBtn) viewOrdersBtn.classList.remove('active');
+
+  if (viewName === 'mongo') {
+    if (mongoSec) mongoSec.style.display = 'block';
+    if (viewMongoBtn) viewMongoBtn.classList.add('active');
     fetchLatteData();
+  } else if (viewName === 'orders') {
+    if (ordersSec) ordersSec.style.display = 'block';
+    if (viewOrdersBtn) viewOrdersBtn.classList.add('active');
+    if (typeof fetchOrdersData === 'function') fetchOrdersData();
   } else {
     if (heroSec) heroSec.style.display = 'block';
     if (catalogSec) catalogSec.style.display = 'block';
-    if (mongoSec) mongoSec.style.display = 'none';
     if (menuSearchBox) menuSearchBox.style.display = 'flex';
-
     if (viewMenuBtn) viewMenuBtn.classList.add('active');
-    if (viewMongoBtn) viewMongoBtn.classList.remove('active');
   }
 }
 
@@ -533,10 +542,32 @@ function updateCartUI() {
 
 async function checkout() {
   if (cart.length === 0) return;
-  alert(`¡Gracias por tu pedido! Total: ${cartTotal.textContent}\nTu orden se guardó automáticamente en MongoDB.`);
+  
+  const totalAmount = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const itemsSummaryStr = cart.map(item => `${item.quantity}x ${item.name}`).join(', ');
+
+  // Guardar en colección de Pedidos (CRUD)
+  try {
+    const baseUrl = window.location.port === '5000' ? '' : `${window.location.protocol}//${window.location.hostname}:5000`;
+    await fetch(`${baseUrl}/api/pedidos`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customerName: '@cliente_kiosko',
+        itemsSummary: itemsSummaryStr,
+        total: totalAmount,
+        status: 'Pendiente'
+      })
+    });
+  } catch(e) {
+    console.error('Error guardando pedido:', e);
+  }
+
+  alert(`¡Gracias por tu pedido! Total: $${totalAmount.toFixed(2)}\nTu orden ha sido registrada en la tabla de Pedidos de MongoDB.`);
   cart = [];
   saveCartAndSync();
   if (cartDrawer) cartDrawer.classList.remove('active');
+  if (typeof fetchOrdersData === 'function') fetchOrdersData();
   await fetchLatteData();
 }
 

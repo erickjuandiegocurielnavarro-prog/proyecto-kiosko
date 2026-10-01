@@ -1450,3 +1450,58 @@ button {
   opacity: 0.4;
 }
 
+/* Pedidos Status Badges and Select Dropdowns */
+.status-select, .form-control-select {
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: var(--surface-card);
+  color: var(--text-main);
+  cursor: pointer;
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+.form-control-select {
+  width: 100%;
+  border-radius: 8px;
+  padding: 0.65rem 0.85rem;
+}
+
+.status-select.badge-pending {
+  background: rgba(243, 156, 18, 0.2);
+  color: #f39c12;
+  border-color: rgba(243, 156, 18, 0.4);
+}
+
+.status-select.badge-prep {
+  background: rgba(52, 152, 219, 0.2);
+  color: #3498db;
+  border-color: rgba(52, 152, 219, 0.4);
+}
+
+.status-select.badge-completed {
+  background: rgba(46, 204, 113, 0.2);
+  color: #2ecc71;
+  border-color: rgba(46, 204, 113, 0.4);
+}
+
+.status-select.badge-canceled {
+  background: rgba(231, 76, 60, 0.2);
+  color: #e74c3c;
+  border-color: rgba(231, 76, 60, 0.4);
+}
+
+.order-summary-text {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  max-width: 250px;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
