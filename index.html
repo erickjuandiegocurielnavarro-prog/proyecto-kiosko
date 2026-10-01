@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aroma & Miga | Menú y Tabla MongoDB</title>
-  <meta name="description" content="Catálogo exclusivo de café, frappé, combos y pan con tabla de visualización de datos MongoDB.">
+  <title>Aroma & Miga | Kiosko Multi-CRUD MongoDB</title>
+  <meta name="description" content="Sistema de Kiosko con Gestión Multi-CRUD en tiempo real para Productos, Lattes y Pedidos en MongoDB.">
   
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,11 +15,12 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- Custom Styles -->
+  <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- Background Decorative Elements -->
+  <!-- Background Decorative Orbs -->
   <div class="bg-glow bg-glow-1"></div>
   <div class="bg-glow bg-glow-2"></div>
 
@@ -30,27 +31,30 @@
         <div class="logo-icon"><i class="fa-solid fa-mug-hot"></i></div>
         <div class="logo-text">
           <span class="brand-name">Aroma & Miga</span>
-          <span class="brand-sub">Café & MongoDB</span>
+          <span class="brand-sub">Multi-CRUD MongoDB</span>
         </div>
       </a>
 
       <!-- View Switcher Tabs -->
       <div class="nav-switcher">
         <button id="viewMenuBtn" class="switch-tab active" onclick="switchMainView('menu')">
-          <i class="fa-solid fa-mug-hot"></i> Menú
+          <i class="fa-solid fa-store"></i> Menú
+        </button>
+        <button id="viewProductsBtn" class="switch-tab" onclick="switchMainView('products')">
+          <i class="fa-solid fa-boxes-stacked"></i> CRUD Productos
         </button>
         <button id="viewMongoBtn" class="switch-tab" onclick="switchMainView('mongo')">
-          <i class="fa-solid fa-table-list"></i> Tabla MongoDB
+          <i class="fa-solid fa-table-list"></i> CRUD Lattes
         </button>
         <button id="viewOrdersBtn" class="switch-tab" onclick="switchMainView('orders')">
-          <i class="fa-solid fa-clipboard-check"></i> Tabla Pedidos (CRUD)
+          <i class="fa-solid fa-clipboard-check"></i> CRUD Pedidos
         </button>
       </div>
 
       <div class="nav-controls">
         <div class="search-box" id="menuSearchBox">
           <i class="fa-solid fa-search search-icon"></i>
-          <input type="text" id="searchInput" placeholder="Buscar en los productos..." autocomplete="off">
+          <input type="text" id="searchInput" placeholder="Buscar productos..." autocomplete="off">
           <button id="clearSearch" class="clear-btn" style="display:none;"><i class="fa-solid fa-times"></i></button>
         </div>
 
@@ -60,7 +64,7 @@
 
         <button id="cartBtn" class="cart-btn">
           <i class="fa-solid fa-shopping-bag"></i>
-          <span class="cart-label">Mi Pedido</span>
+          <span>Mi Pedido</span>
           <span id="cartBadge" class="badge">0</span>
         </button>
       </div>
@@ -70,13 +74,13 @@
   <!-- Hero Section (Visible in Menu View) -->
   <section id="heroSection" class="hero">
     <div class="container hero-content">
-      <div class="hero-tag"><i class="fa-solid fa-star"></i> Menú Especializado</div>
+      <div class="hero-tag"><i class="fa-solid fa-star"></i> Kiosko Digital Interactivo</div>
       <h1 class="hero-title">Nuestras 4 Especialidades</h1>
       <p class="hero-desc">
-        Explora nuestro catálogo exclusivo seleccionado con los mejores granos de café, frappés helados, combos completos y pan fresco horneado día a día.
+        Catálogo en tiempo real sincronizado con MongoDB. Explora cafés, frappés helados, combos y pan artesanal recién horneado.
       </p>
       
-      <!-- Category Badges Banner -->
+      <!-- Category Chips -->
       <div class="hero-categories">
         <div class="hero-cat-chip" onclick="filterCategory('cafe')">
           <i class="fa-solid fa-mug-saucer"></i> <span>Café</span>
@@ -96,11 +100,10 @@
 
   <!-- Main Catalog Section (Visible in Menu View) -->
   <main id="catalogSection" class="container catalog-section">
-    <!-- Category Filter Bar -->
     <div class="filter-wrapper">
       <div class="filter-bar">
         <button class="filter-btn active" data-category="all">
-          <i class="fa-solid fa-border-all"></i> Todos (4)
+          <i class="fa-solid fa-border-all"></i> Todos
         </button>
         <button class="filter-btn" data-category="cafe">
           <i class="fa-solid fa-mug-hot"></i> Café
@@ -115,46 +118,154 @@
           <i class="fa-solid fa-bread-slice"></i> Pan en General
         </button>
       </div>
-
-      <div class="view-toggle">
-        <button id="grid3Btn" class="toggle-btn active" title="Vista Cuadrícula"><i class="fa-solid fa-grip"></i></button>
-        <button id="listBtn" class="toggle-btn" title="Vista Lista"><i class="fa-solid fa-list"></i></button>
-      </div>
     </div>
 
     <!-- Product Grid -->
     <div id="productGrid" class="product-grid">
-      <!-- Cards will be populated dynamically by JavaScript -->
+      <!-- Cards generated dynamically -->
     </div>
 
-    <!-- Empty State -->
     <div id="emptyState" class="empty-state" style="display: none;">
       <i class="fa-solid fa-magnifying-glass-minus"></i>
-      <h3>No se encontraron resultados</h3>
-      <p>Intenta buscando otra palabra o selecciona una de las 4 categorías principales.</p>
-      <button onclick="resetFilters()" class="btn-primary">Ver todas las categorías</button>
+      <h3>No se encontraron productos</h3>
+      <p>Intenta buscando otra palabra o selecciona una categoría.</p>
     </div>
   </main>
 
-  <!-- Section: MongoDB Data Table -->
-  <section id="mongoSection" class="container mongo-section" style="display: none;">
-    <!-- Header & Status -->
+  <!-- ==========================================================================
+       SECTION 1: CRUD PRODUCTOS / CATÁLOGO
+       ========================================================================== -->
+  <section id="productsSection" class="container mongo-section" style="display: none;">
     <div class="mongo-header">
       <div class="mongo-title-box">
-        <h2><i class="fa-solid fa-database"></i> Registros de MongoDB</h2>
-        <p>Visualización y administración en tiempo real de tu colección de MongoDB (<code>{ _id, name, precio, user }</code>)</p>
+        <h2><i class="fa-solid fa-boxes-stacked"></i> CRUD de Productos (Catálogo MongoDB)</h2>
+        <p>Crear, actualizar, modificar y eliminar artículos del menú (<code>{ _id, name, category, price, image, description }</code>)</p>
+      </div>
+      <div class="mongo-status-badge status-active">
+        <span class="status-dot"></span> <span id="prodStatusText">Verificando conexión...</span>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fa-solid fa-box-open"></i></div>
+        <div class="stat-info">
+          <span class="stat-label">Total Productos</span>
+          <span id="statTotalProducts" class="stat-value">0</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fa-solid fa-calculator"></i></div>
+        <div class="stat-info">
+          <span class="stat-label">Precio Promedio</span>
+          <span id="statAvgProdPrice" class="stat-value">$0.00</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mongo-content-grid">
+      <!-- Product Form -->
+      <div class="mongo-form-card">
+        <h3 id="prodFormTitle"><i class="fa-solid fa-plus-circle"></i> Agregar Producto al Catálogo</h3>
+        <form id="productForm" onsubmit="handleProductFormSubmit(event)">
+          <div class="form-group">
+            <label for="prodName">Nombre del Producto</label>
+            <input type="text" id="prodName" placeholder="Ej. Frappé de Menta" required autocomplete="off">
+          </div>
+
+          <div class="form-group">
+            <label for="prodCategory">Categoría</label>
+            <select id="prodCategory" class="form-control-select">
+              <option value="cafe">☕ Café</option>
+              <option value="frappe">❄️ Frappé</option>
+              <option value="combos">🍱 Combos</option>
+              <option value="pan">🥐 Pan en General</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="prodPrice">Precio ($)</label>
+            <div class="input-prefix-wrapper">
+              <span class="prefix">$</span>
+              <input type="number" id="prodPrice" step="0.50" placeholder="55.00" required autocomplete="off">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="prodImage">Ruta de Imagen (URL / Local)</label>
+            <input type="text" id="prodImage" placeholder="images/cafe.jpg" autocomplete="off">
+          </div>
+
+          <div class="form-group">
+            <label for="prodDesc">Descripción</label>
+            <textarea id="prodDesc" rows="2" placeholder="Detalles e ingredientes del producto..."></textarea>
+          </div>
+
+          <button type="submit" id="btnSubmitProduct" class="btn-primary btn-block">
+            <i class="fa-solid fa-plus-circle"></i> Agregar a Catálogo
+          </button>
+          <button type="button" id="btnCancelProductEdit" class="btn-secondary btn-block" style="display:none; margin-top:0.5rem;" onclick="resetProductForm()">
+            Cancelar Edición
+          </button>
+        </form>
+      </div>
+
+      <!-- Products Table -->
+      <div class="mongo-table-card">
+        <div class="table-toolbar">
+          <div class="table-search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="prodSearchInput" placeholder="Filtrar por nombre o categoría..." oninput="filterProductsTable()">
+          </div>
+          <button onclick="fetchProductsData()" class="btn-secondary">
+            <i class="fa-solid fa-rotate-right"></i> Recargar
+          </button>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Producto</th>
+                <th>Categoría</th>
+                <th>Precio</th>
+                <th style="text-align: center;">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="productsTableBody">
+              <!-- Dynamic rows -->
+            </tbody>
+          </table>
+        </div>
+
+        <div id="productsEmptyState" class="table-empty" style="display: none;">
+          <i class="fa-solid fa-inbox"></i>
+          <p>No hay productos registrados en el catálogo.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       SECTION 2: CRUD LATTES / REGISTROS
+       ========================================================================== -->
+  <section id="mongoSection" class="container mongo-section" style="display: none;">
+    <div class="mongo-header">
+      <div class="mongo-title-box">
+        <h2><i class="fa-solid fa-database"></i> CRUD de Lattes / Registros (MongoDB)</h2>
+        <p>Administración directa de la colección de registros (<code>{ _id, name, precio, user, createdAt }</code>)</p>
       </div>
       <div id="mongoStatusBadge" class="mongo-status-badge status-active">
         <span class="status-dot"></span> <span id="statusText">Verificando conexión...</span>
       </div>
     </div>
 
-    <!-- Stats Cards -->
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-icon"><i class="fa-solid fa-list-ol"></i></div>
         <div class="stat-info">
-          <span class="stat-label">Total de Registros</span>
+          <span class="stat-label">Total Registros</span>
           <span id="statTotalCount" class="stat-value">0</span>
         </div>
       </div>
@@ -174,22 +285,20 @@
       </div>
     </div>
 
-    <!-- Main Grid: Form + Table -->
     <div class="mongo-content-grid">
-      <!-- Form Card to Insert Data into MongoDB -->
       <div class="mongo-form-card">
         <h3><i class="fa-solid fa-plus-circle"></i> Agregar a MongoDB</h3>
         <form id="mongoForm" onsubmit="handleMongoSubmit(event)">
           <div class="form-group">
-            <label for="inputName">Nombre del producto (<code>name</code>)</label>
-            <input type="text" id="inputName" placeholder="Ej. latte, cappuccino" required autocomplete="off">
+            <label for="inputName">Nombre (<code>name</code>)</label>
+            <input type="text" id="inputName" placeholder="Ej. latte, mocha" required autocomplete="off">
           </div>
           
           <div class="form-group">
             <label for="inputPrice">Precio (<code>precio</code>)</label>
             <div class="input-prefix-wrapper">
               <span class="prefix">$</span>
-              <input type="number" id="inputPrice" step="0.5" placeholder="40" required autocomplete="off">
+              <input type="number" id="inputPrice" step="0.50" placeholder="40" required autocomplete="off">
             </div>
           </div>
 
@@ -204,14 +313,13 @@
         </form>
       </div>
 
-      <!-- Table Box -->
       <div class="mongo-table-card">
         <div class="table-toolbar">
           <div class="table-search">
             <i class="fa-solid fa-magnifying-glass"></i>
             <input type="text" id="mongoSearchInput" placeholder="Filtrar por nombre, ID o usuario..." oninput="filterMongoTable()">
           </div>
-          <button onclick="fetchLatteData()" class="btn-secondary" title="Actualizar datos">
+          <button onclick="fetchLatteData()" class="btn-secondary">
             <i class="fa-solid fa-rotate-right"></i> Recargar
           </button>
         </div>
@@ -221,10 +329,10 @@
             <thead>
               <tr>
                 <th>ID (ObjectId)</th>
-                <th>Nombre (<code>name</code>)</th>
-                <th>Precio (<code>precio</code>)</th>
-                <th>Usuario (<code>user</code>)</th>
-                <th>Fecha de Registro</th>
+                <th>Nombre</th>
+                <th>Precio</th>
+                <th>Usuario</th>
+                <th>Fecha</th>
                 <th style="text-align: center;">Acción</th>
               </tr>
             </thead>
@@ -236,15 +344,16 @@
 
         <div id="mongoEmptyState" class="table-empty" style="display: none;">
           <i class="fa-solid fa-inbox"></i>
-          <p>No se encontraron registros en la colección de MongoDB.</p>
+          <p>No se encontraron registros en MongoDB.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Section: Pedidos CRUD Data Table -->
+  <!-- ==========================================================================
+       SECTION 3: CRUD PEDIDOS / ÓRDENES
+       ========================================================================== -->
   <section id="ordersSection" class="container mongo-section" style="display: none;">
-    <!-- Header & Status -->
     <div class="mongo-header">
       <div class="mongo-title-box">
         <h2><i class="fa-solid fa-clipboard-check"></i> CRUD de Pedidos (MongoDB)</h2>
@@ -255,12 +364,11 @@
       </div>
     </div>
 
-    <!-- Stats Cards -->
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-icon"><i class="fa-solid fa-receipt"></i></div>
         <div class="stat-info">
-          <span class="stat-label">Total de Pedidos</span>
+          <span class="stat-label">Total Pedidos</span>
           <span id="statTotalOrders" class="stat-value">0</span>
         </div>
       </div>
@@ -280,24 +388,22 @@
       </div>
     </div>
 
-    <!-- Main Grid: Form + Table -->
     <div class="mongo-content-grid">
-      <!-- Form Card to Insert Order into MongoDB -->
       <div class="mongo-form-card">
         <h3><i class="fa-solid fa-cart-plus"></i> Registrar Pedido Manual</h3>
         <form id="orderForm" onsubmit="handleCreateOrderSubmit(event)">
           <div class="form-group">
-            <label for="orderCustomer">Nombre del Cliente (<code>customerName</code>)</label>
+            <label for="orderCustomer">Nombre del Cliente</label>
             <input type="text" id="orderCustomer" placeholder="@cliente" value="@cliente" required autocomplete="off">
           </div>
           
           <div class="form-group">
-            <label for="orderSummary">Resumen de Productos (<code>itemsSummary</code>)</label>
+            <label for="orderSummary">Resumen de Productos</label>
             <input type="text" id="orderSummary" placeholder="Ej. 2x Cappuccino, 1x Pan Artesanal" required autocomplete="off">
           </div>
 
           <div class="form-group">
-            <label for="orderTotal">Total ($) (<code>total</code>)</label>
+            <label for="orderTotal">Total ($)</label>
             <div class="input-prefix-wrapper">
               <span class="prefix">$</span>
               <input type="number" id="orderTotal" step="0.50" placeholder="125.00" required autocomplete="off">
@@ -305,7 +411,7 @@
           </div>
 
           <div class="form-group">
-            <label for="orderStatusSelect">Estado Inicial (<code>status</code>)</label>
+            <label for="orderStatusSelect">Estado Inicial</label>
             <select id="orderStatusSelect" class="form-control-select">
               <option value="Pendiente">⏳ Pendiente</option>
               <option value="En Preparación">👨‍🍳 En Preparación</option>
@@ -320,14 +426,13 @@
         </form>
       </div>
 
-      <!-- Table Box -->
       <div class="mongo-table-card">
         <div class="table-toolbar">
           <div class="table-search">
             <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="orderSearchInput" placeholder="Filtrar pedidos por cliente, ID o resumen..." oninput="filterOrdersTable()">
+            <input type="text" id="orderSearchInput" placeholder="Filtrar pedidos por cliente o ID..." oninput="filterOrdersTable()">
           </div>
-          <button onclick="fetchOrdersData()" class="btn-secondary" title="Actualizar pedidos">
+          <button onclick="fetchOrdersData()" class="btn-secondary">
             <i class="fa-solid fa-rotate-right"></i> Recargar
           </button>
         </div>
@@ -353,75 +458,23 @@
 
         <div id="ordersEmptyState" class="table-empty" style="display: none;">
           <i class="fa-solid fa-inbox"></i>
-          <p>No hay pedidos registrados en la colección de MongoDB.</p>
+          <p>No hay pedidos registrados en MongoDB.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Product Detail Modal -->
-  <div id="productModal" class="modal-overlay" style="display: none;">
-    <div class="modal-card">
-      <button id="closeModal" class="modal-close-btn">&times;</button>
-      
-      <div class="modal-body">
-        <div class="modal-img-container">
-          <img id="modalImg" src="" alt="Imagen de Producto">
-          <span id="modalCategoryTag" class="category-chip">Categoría</span>
-        </div>
-        <div class="modal-info">
-          <h2 id="modalTitle">Título del Producto</h2>
-          <div class="modal-price-row">
-            <span id="modalPrice" class="modal-price">$0.00</span>
-            <div class="rating"><i class="fa-solid fa-star"></i> 4.9 (Reseñas)</div>
-          </div>
-          <p id="modalDescription" class="modal-description">Descripción detallada...</p>
-          
-          <div class="modal-highlights">
-            <div class="highlight-item">
-              <i class="fa-solid fa-fire-flame-curved"></i>
-              <span>Ingredientes de Calidad</span>
-            </div>
-            <div class="highlight-item">
-              <i class="fa-solid fa-clock"></i>
-              <span>Preparado al Momento</span>
-            </div>
-          </div>
-
-          <div class="modal-actions">
-            <div class="quantity-selector">
-              <button id="qtyMinus" class="qty-btn">-</button>
-              <span id="qtyVal">1</span>
-              <button id="qtyPlus" class="qty-btn">+</button>
-            </div>
-            <button id="modalAddCartBtn" class="btn-primary flex-grow">
-              <i class="fa-solid fa-cart-plus"></i> Agregar al Pedido
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- Cart Drawer -->
   <div id="cartDrawer" class="cart-drawer-overlay">
-    <div class="cart-drawer">
-      <div class="cart-header">
+    <div class="modal-card" style="margin: auto; max-width: 450px;">
+      <div style="padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-glass);">
         <h3><i class="fa-solid fa-bag-shopping"></i> Tu Pedido</h3>
-        <button id="closeCart" class="close-cart-btn">&times;</button>
+        <button id="closeCart" class="icon-btn">&times;</button>
       </div>
-
-      <div id="cartItemsList" class="cart-items-list">
-        <!-- Cart Items inserted dynamically -->
-      </div>
-
-      <div class="cart-footer">
-        <div class="cart-summary-row">
-          <span>Subtotal</span>
-          <span id="cartSubtotal">$0.00</span>
-        </div>
-        <div class="cart-summary-row total-row">
-          <span>Total Estimado</span>
+      <div id="cartItemsList" style="padding: 1.5rem; max-height: 350px; overflow-y: auto;"></div>
+      <div style="padding: 1.5rem; border-top: 1px solid var(--border-glass);">
+        <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 1.2rem; margin-bottom: 1rem;">
+          <span>Total</span>
           <span id="cartTotal">$0.00</span>
         </div>
         <button id="checkoutBtn" class="btn-primary btn-block" onclick="checkout()">
@@ -433,14 +486,8 @@
 
   <!-- Footer -->
   <footer class="footer">
-    <div class="container footer-content">
-      <div class="footer-brand">
-        <h3>Aroma & Miga</h3>
-        <p>Especialistas en <strong>Café</strong>, <strong>Frappé</strong>, <strong>Combos</strong>, <strong>Pan</strong> y desarrollo con <strong>MongoDB</strong>.</p>
-      </div>
-      <div class="footer-copy">
-        <p>&copy; 2026 Menú Digital & MongoDB Dashboard. Todos los derechos reservados.</p>
-      </div>
+    <div class="container">
+      <p>&copy; 2026 Aroma & Miga Kiosko | Sistema Multi-CRUD MongoDB. Todos los derechos reservados.</p>
     </div>
   </footer>
 
@@ -450,9 +497,12 @@
     <span id="toastMsg">Notificación</span>
   </div>
 
-  <!-- App Logic Scripts -->
+  <!-- App Scripts -->
+  <script src="js/productsCrud.js"></script>
+  <script src="productsCrud.js"></script>
   <script src="js/orders.js"></script>
   <script src="orders.js"></script>
+  <script src="js/app.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

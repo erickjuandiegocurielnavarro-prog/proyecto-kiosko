@@ -94,15 +94,17 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchLatteData(); // Cargar datos de MongoDB al iniciar
 });
 
-// Switch Main View (Menu vs Tabla MongoDB vs Tabla Pedidos)
+// Switch Main View (Menu vs CRUD Productos vs CRUD Lattes vs CRUD Pedidos)
 function switchMainView(viewName) {
   currentMainView = viewName;
   const heroSec = document.getElementById('heroSection');
   const catalogSec = document.getElementById('catalogSection');
+  const productsSec = document.getElementById('productsSection');
   const mongoSec = document.getElementById('mongoSection');
   const ordersSec = document.getElementById('ordersSection');
   
   const viewMenuBtn = document.getElementById('viewMenuBtn');
+  const viewProductsBtn = document.getElementById('viewProductsBtn');
   const viewMongoBtn = document.getElementById('viewMongoBtn');
   const viewOrdersBtn = document.getElementById('viewOrdersBtn');
   const menuSearchBox = document.getElementById('menuSearchBox');
@@ -110,15 +112,21 @@ function switchMainView(viewName) {
   // Ocultar todas las secciones por defecto
   if (heroSec) heroSec.style.display = 'none';
   if (catalogSec) catalogSec.style.display = 'none';
+  if (productsSec) productsSec.style.display = 'none';
   if (mongoSec) mongoSec.style.display = 'none';
   if (ordersSec) ordersSec.style.display = 'none';
   if (menuSearchBox) menuSearchBox.style.display = 'none';
 
   if (viewMenuBtn) viewMenuBtn.classList.remove('active');
+  if (viewProductsBtn) viewProductsBtn.classList.remove('active');
   if (viewMongoBtn) viewMongoBtn.classList.remove('active');
   if (viewOrdersBtn) viewOrdersBtn.classList.remove('active');
 
-  if (viewName === 'mongo') {
+  if (viewName === 'products') {
+    if (productsSec) productsSec.style.display = 'block';
+    if (viewProductsBtn) viewProductsBtn.classList.add('active');
+    if (typeof fetchProductsData === 'function') fetchProductsData();
+  } else if (viewName === 'mongo') {
     if (mongoSec) mongoSec.style.display = 'block';
     if (viewMongoBtn) viewMongoBtn.classList.add('active');
     fetchLatteData();
@@ -131,6 +139,7 @@ function switchMainView(viewName) {
     if (catalogSec) catalogSec.style.display = 'block';
     if (menuSearchBox) menuSearchBox.style.display = 'flex';
     if (viewMenuBtn) viewMenuBtn.classList.add('active');
+    if (typeof fetchProductsData === 'function') fetchProductsData();
   }
 }
 

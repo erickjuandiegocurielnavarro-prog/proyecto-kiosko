@@ -58,6 +58,36 @@ exports.createLatte = async (req, res) => {
   }
 };
 
+// PUT: Actualizar un registro por ID
+exports.updateLatte = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, precio, user } = req.body;
+
+    const updateData = {};
+    if (name !== undefined) updateData.name = String(name).trim();
+    if (precio !== undefined) updateData.precio = Number(precio);
+    if (user !== undefined) updateData.user = String(user).trim();
+
+    if (mongoose.connection.readyState === 1) {
+      const updated = await Latte.findByIdAndUpdate(id, updateData, { new: true });
+      if (!updated) {
+        return res.status(404).json({ success: false, message: 'Registro no encontrado en MongoDB.' });
+      }
+      return res.json({ success: true, source: 'mongodb', data: updated });
+    } else {
+      const idx = memoryStorage.findIndex(item => String(item._id) === String(id));
+      if (idx === -1) {
+        return res.status(404).json({ success: false, message: 'Registro no encontrado.' });
+      }
+      memoryStorage[idx] = { ...memoryStorage[idx], ...updateData };
+      return res.json({ success: true, source: 'memory', data: memoryStorage[idx] });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
 // DELETE: Eliminar un registro por ID
 exports.deleteLatte = async (req, res) => {
   try {

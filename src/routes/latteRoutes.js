@@ -4,6 +4,7 @@ const latteController = require('../controllers/latteController');
 
 router.get('/', latteController.getLattes);
 router.post('/', latteController.createLatte);
+router.put('/:id', latteController.updateLatte);
 router.delete('/:id', latteController.deleteLatte);
 
 module.exports = router;
